@@ -1,0 +1,14 @@
+nginx-http-auth
+conf/app.conf
+gitversion
+nohup.out
+
+*.exe
+*.swp
+*.log
+*.pid
+*.tmp
+
+.idea
+.vscode
+.DS_Store
