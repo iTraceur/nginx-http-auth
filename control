@@ -8,6 +8,17 @@ pidfile=$WORKSPACE"/nginx-http-auth.pid"
 logfile=$WORKSPACE"/nginx-http-auth.log"
 conf=$WORKSPACE"/conf/app.conf"
 
+version="0.1.0"
+function get_version() {
+    ver=`git tag | tail -n1`
+    if [ $? -ne 0 ]; then
+        echo "not a git repo"
+        exit 1
+    elif [ ! -z $ver ]; then
+        version=$ver
+    fi
+}
+
 function check_pid() {
     if [ -f $pidfile ];then
         pid=`cat $pidfile`
@@ -67,6 +78,15 @@ function build() {
     cd $WORKSPACE
     echo $1
 
+    [ -d g ] || mkdir g
+    get_version
+    cat > g/version.go << EOF
+package g
+
+const (
+	VERSION = "$version"
+)
+EOF
     if [ "$1" == "linux" ] ;then
         CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
     elif [ "$1" == "windows" ] ;then
@@ -81,18 +101,16 @@ function build() {
 }
 
 function pack() {
-    build $1
     git log -1 --pretty=%h > gitversion
-    version=`$app -v`
-    file_list="nginx-http-auth static views control conf/app.example.conf conf/nginx.conf"
+    get_version
+    file_list="nginx-http-auth static views control conf/app.example.conf conf/nginx.example.conf"
     echo "...tar $app-$version.tar.gz <= $file_list"
     tar zcf $app-$version.tar.gz gitversion $file_list
 }
 
 function packbin() {
-    build $1
     git log -1 --pretty=%h > gitversion
-    version=`$app -v`
+    get_version
     tar zcvf $app-bin-$version.tar.gz nginx-http-auth gitversion
 }
 
