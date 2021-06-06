@@ -21,8 +21,8 @@ func (this *ControlController) Get() {
 	clientIP := this.Ctx.Input.IP()
 
 	// 获取用户Session
-	username := this.GetSession("uname")
-	if username == nil {
+	username, ok := this.GetSession("uname").(string)
+	if !ok {
 		this.Redirect("/passport/login", 302)
 		return
 	}
@@ -33,10 +33,11 @@ func (this *ControlController) Get() {
 		logs.Warn(fmt.Sprintf("%s - get manage users failed: %s", clientIP, err.Error()))
 		manageUsers = []string{"admin"}
 	}
+
 	// 管理用户校验
-	if !utils.InSlice(username.(string), manageUsers) {
+	if !utils.InSlice(username, manageUsers) {
 		logs.Warn(fmt.Sprintf("%s - %s - access to control API was denied", clientIP, username))
-		this.Abort("403")
+		this.Abort("453")
 	}
 
 	// 获取管理类型

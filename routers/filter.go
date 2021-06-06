@@ -1,6 +1,8 @@
 package routers
 
 import (
+	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/beego/beego/v2/core/utils"
@@ -18,14 +20,15 @@ func init() {
 var LoginFilter = func(ctx *context.Context) {
 	_, ok := ctx.Input.Session("uname").(string)
 	if !ok {
-		uri := strings.Split(ctx.Request.RequestURI, "?")[0]
-		uri = strings.TrimRight(uri, "/")
-		switch uri {
+		uri := ctx.Request.RequestURI
+		uriPath := strings.Split(uri, "?")[0]
+		uriPath = strings.TrimRight(uriPath, "/")
+		switch uriPath {
 		case "/auth-proxy", "/users/add", "/users/edit", "/users/delete":
 			ctx.Abort(401, "401")
 		case "/passport/login":
 		default:
-			ctx.Redirect(302, "/passport/login")
+			ctx.Redirect(302, fmt.Sprintf("/passport/login?target=%s", url.QueryEscape(uri)))
 		}
 	}
 }

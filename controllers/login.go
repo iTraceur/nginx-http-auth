@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"fmt"
+	"time"
+
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
-	"time"
 
 	"github.com/beego/beego/v2/client/cache"
 	"github.com/beego/beego/v2/core/logs"
@@ -32,12 +33,6 @@ func init() {
 }
 
 var cpt *captcha.Captcha
-
-func (this *LoginController) ClearLoginInfo() {
-	_ = this.DelSession("uname")
-	_ = this.DelSession("loginFailed")
-	_ = this.DelSession("userAuthHash")
-}
 
 func (this *LoginController) Get() {
 	this.Layout = "main.html"
@@ -77,7 +72,7 @@ func (this *LoginController) Get() {
 
 	// 强制登录前需要清空直通登录后的登录状态
 	if forceLogin {
-		this.ClearLoginInfo()
+		_ = this.DestroySession()
 	}
 
 	// 获取目标跳转路径
@@ -123,25 +118,24 @@ func (this *LoginController) Get() {
 	}
 
 	// 如果用户已登录，直接跳转目标页面
-	uname := this.GetSession("uname")
-	if uname != nil {
+	if _, ok := this.GetSession("uname").(string); ok {
 		this.Redirect(target, 302)
 		return
 	}
 
 	// 如之前登录失败过，则本次登录需要输入验证
-	loginFailed := this.GetSession("loginFailed")
-	if loginFailed != nil {
+	loginFailedCode, ok := this.GetSession("loginFailedCode").(int)
+	if ok {
 		this.Data["captcha"] = true
 	}
 	// 登录失败提示信息
 	var msg string
-	switch loginFailed {
-	case "1":
+	switch loginFailedCode {
+	case 1:
 		msg = "用户名或密码错误！"
-	case "2":
+	case 2:
 		msg = "用户不存在或已禁用！"
-	case "3":
+	case 3:
 		msg = "验证码错误！"
 	}
 	this.Data["msg"] = msg
@@ -161,10 +155,9 @@ func (this *LoginController) Post() {
 	target := this.Ctx.Request.Form.Get("target")
 
 	// 检验验证码，只在用户登录失败后再登录时需要校验验证码
-	loginFailed := this.GetSession("loginFailed")
-	if loginFailed != nil {
+	if  _, ok := this.GetSession("loginFailedCode").(int); ok {
 		if !cpt.VerifyReq(this.Ctx.Request) {
-			_ = this.SetSession("loginFailed", "3")
+			_ = this.SetSession("loginFailedCode", 3)
 			logs.Warn(fmt.Sprintf("%s - %s - login failed: captcha wrong", clientIP, username))
 			this.Redirect(fmt.Sprintf("/passport/login?target=%s", target), 302)
 			return
@@ -191,7 +184,6 @@ func (this *LoginController) Post() {
 	if len(allowUsers) > 0 && !beeUtils.InSlice(username, allowUsers) || len(denyUsers) > 0 && beeUtils.InSlice(username, denyUsers) {
 		logs.Warn(fmt.Sprintf("%s - login failed: user %s is not allowed", clientIP, username))
 		this.Abort("453")
-		return
 	}
 
 	// 获取认证方式
@@ -212,13 +204,13 @@ func (this *LoginController) Post() {
 			// 查询用户名对应的用户
 			user, err := models.GetUserByUsername(username)
 			if err != nil { // 查询用户名对应的用户失败
-				_ = this.SetSession("loginFailed", "2")
+				_ = this.SetSession("loginFailedCode", 2)
 				logs.Error(fmt.Sprintf("%s - %s - login failed: %s", clientIP, username, err.Error()))
 				this.Redirect(fmt.Sprintf("/passport/login?target=%s", target), 302)
 				return
 			}
 			if user == nil || !user.Active { // 用户名对应的用户不存在或已禁用
-				_ = this.SetSession("loginFailed", "2")
+				_ = this.SetSession("loginFailedCode", 2)
 				logs.Warn(fmt.Sprintf("%s - %s - login failed: user is not active", clientIP, username))
 				this.Redirect(fmt.Sprintf("/passport/login?target=%s", target), 302)
 				return
@@ -236,7 +228,7 @@ func (this *LoginController) Post() {
 			// 校验密码
 			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 			if err != nil {
-				_ = this.SetSession("loginFailed", "1")
+				_ = this.SetSession("loginFailedCode", 1)
 				logs.Warn(fmt.Sprintf("%s - %s - login failed: %s", clientIP, username, err.Error()))
 				this.Redirect(fmt.Sprintf("/passport/login?target=%s", target), 302)
 				return
@@ -254,7 +246,7 @@ func (this *LoginController) Post() {
 		}
 	} else { // 远程认证
 		if !utils.HttpAuth(username, password) {
-			_ = this.SetSession("loginFailed", "1")
+			_ = this.SetSession("loginFailedCode", 1)
 			logs.Warn(fmt.Sprintf("%s - %s - login failed: auth api returnd failure", clientIP, username))
 			this.Redirect(fmt.Sprintf("/passport/login?target=%s", target), 302)
 			return

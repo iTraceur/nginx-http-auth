@@ -12,12 +12,13 @@ type LogoutController struct {
 
 func (this *LogoutController) Get() {
 	clientIP := this.Ctx.Input.IP()
-	username := this.GetSession("uname")
-	if username != nil {
-		_ = this.DelSession("uname")
-		_ = this.DelSession("loginFailed")
-		_ = this.DelSession("userAuthHash")
-		logs.Notice(fmt.Sprintf("%s - user(%s) logout", clientIP, username))
+	username, ok := this.GetSession("uname").(string)
+	if !ok {
+		this.Redirect("/passport/login", 302)
+		return
 	}
+
+	_ = this.DestroySession()
+	logs.Notice(fmt.Sprintf("%s - user(%s) logout", clientIP, username))
 	this.Redirect("/passport/login", 302)
 }

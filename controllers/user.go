@@ -20,14 +20,18 @@ type UserStatusController struct {
 }
 
 func (this *UserStatusController) ClearLoginInfo() {
-	_ = this.DelSession("uname")
-	_ = this.DelSession("loginFailed")
-	_ = this.DelSession("userAuthHash")
+	_ = this.DestroySession()
 	this.User = nil
 }
 
 func (this *UserStatusController) Prepare() {
 	username, ok := this.GetSession("uname").(string)
+	if !ok {
+		this.ClearLoginInfo()
+		this.Redirect("/passport/login", 302)
+		return
+	}
+
 	userAuthHash, ok := this.GetSession("userAuthHash").(string)
 	if !ok {
 		this.ClearLoginInfo()
