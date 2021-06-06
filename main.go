@@ -42,13 +42,9 @@ func main() {
 		models.CreateAdminUser()
 	}
 
-	// 启用Session和XSRF过滤
+	// 强制启用Session和XSRF过滤
 	beego.BConfig.WebConfig.Session.SessionOn = true
-	beego.BConfig.WebConfig.Session.SessionName = "SessionID"
-	beego.BConfig.WebConfig.Session.SessionCookieLifeTime = 3600
 	beego.BConfig.WebConfig.EnableXSRF = true
-	beego.BConfig.WebConfig.XSRFKey = "272ae48b83413ca9982db969e22f1ece"
-	beego.BConfig.WebConfig.XSRFExpire = 3600
 
 	beego.Run()
 }
