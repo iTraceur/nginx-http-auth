@@ -3,6 +3,8 @@
 An authentication backend for the Nginx `ngx_http_auth_request_module` module.
 
 [中文](https://github.com/iTraceur/nginx-http-auth/blob/main/README_CN.md)
+ | 
+[Demo](https://auth-demo.itraceur.com/), user/password: admin/auth-demo, this user has administrator privileges and can operate at will, and the data will be recovered every hour.
 
 ## usage
 ### Build from source
@@ -78,3 +80,32 @@ deny = test;demo  # Users that are denied to access
 # cp conf/nginx.example.conf /etc/nginx/conf.d/nginx-http-auth.conf  # and change it to suit your needs
 # service nginx reload
 ```
+
+## Screenshots
+### Auth login
+![auth login][auth-login]
+
+### Auth captcha
+> Captcha is required after login failure.
+
+![auth captcha][auth-captcha]
+
+### User list
+![user lig][user-list]
+
+### Add user
+![add user][add-user]
+
+### Edit user
+![edit user][edit-user]
+
+### Delete user
+![delete user][delete-user]
+
+
+[auth-login]: ./static/screenshot/auth-login.jpg
+[auth-captcha]: ./static/screenshot/auth-captcha.jpg
+[user-list]: ./static/screenshot/user-list.jpg
+[add-user]: ./static/screenshot/add-user.jpg
+[edit-user]: ./static/screenshot/edit-user.jpg
+[delete-user]: ./static/screenshot/delete-user.jpg

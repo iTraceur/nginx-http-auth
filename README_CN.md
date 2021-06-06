@@ -2,6 +2,8 @@
 
 一个用于Nginx `ngx_http_auth_request_module` 模块的认证后端。
 
+[Demo演示](https://auth-demo.itraceur.com/), 用户/密码：admin/auth-demo，该用户有管理员权限，可随意操作，每个整点小时数据会进行重置。
+
 ## 安装使用
 ### 从源码构建
 
@@ -74,3 +76,32 @@ deny = test;demo  # 拒绝访问的用户
 # cp conf/nginx.example.conf /etc/nginx/conf.d/nginx-http-auth.conf  # 按需要更改相应的配置
 # service nginx reload
 ```
+
+## 效果截图
+### 认证登录
+![认证登录][auth-login]
+
+### 登录验证码
+> 登录失败后需要输入验证码。
+
+![auth captcha][auth-captcha]
+
+### 用户列表
+![用户列表][user-list]
+
+### 添加用户
+![添加用户][add-user]
+
+### 编辑用户
+![编辑用户][edit-user]
+
+### 删除用户
+![删除用户][delete-user]
+
+
+[auth-login]: ./static/screenshot/auth-login.jpg
+[auth-captcha]: ./static/screenshot/auth-captcha.jpg
+[user-list]: ./static/screenshot/user-list.jpg
+[add-user]: ./static/screenshot/add-user.jpg
+[edit-user]: ./static/screenshot/edit-user.jpg
+[delete-user]: ./static/screenshot/delete-user.jpg
