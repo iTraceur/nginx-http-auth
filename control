@@ -15,7 +15,7 @@ function get_version() {
         echo "not a git repo"
         exit 1
     elif [ ! -z $ver ]; then
-        version=$ver
+        version=${ver#*v}
     fi
 }
 
