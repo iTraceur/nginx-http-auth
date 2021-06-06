@@ -22,7 +22,6 @@ import (
 func init() {
 	_ = orm.RegisterDriver("sqlite3", orm.DRSqlite)
 	_ = orm.RegisterDataBase("default", "sqlite3", "./data.db")
-	_ = orm.RunSyncdb("default", false, true)
 }
 
 func main() {
@@ -37,6 +36,7 @@ func main() {
 	if beego.BConfig.RunMode == beego.DEV {
 		orm.Debug = true
 	}
+	_ = orm.RunSyncdb("default", false, true)
 
 	if authProvider, err := beego.AppConfig.String("authProvider"); err != nil || authProvider == "local" {
 		models.CreateAdminUser()
