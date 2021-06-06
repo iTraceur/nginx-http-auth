@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"encoding/binary"
 	"net"
-
 	"strings"
+
+	"encoding/binary"
 )
 
 func IpCheck(thisIP string, ips []string) bool {

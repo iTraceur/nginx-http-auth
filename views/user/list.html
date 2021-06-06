@@ -1,0 +1,75 @@
+<div class="card border-secondary mt-5">
+    <div class="card-header"><h4 class="mb-0">用户列表</h4></div>
+    <div class="card-body text-secondary">
+        <button type="button" class="btn btn-primary mb-3" onclick="showAddUserModal()">添加用户</button>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>姓名</th>
+                <th>用户名</th>
+                <th>客户端IP</th>
+                <th>启用</th>
+                <th>临时用户</th>
+                <th>创建时间</th>
+                <th>更新时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range $index, $user := .users}}
+                <tr>
+                    <th scope="row">{{add $index 1}}</th>
+                    <td>{{if $user.Name}}{{$user.Name}}{{else}}{{$user.Username}}{{end}}</td>
+                    <td>{{if $user.Username}}{{$user.Username}}{{else}}-{{end}}</td>
+                    <td>{{if $user.ClientIp}}{{$user.ClientIp}}{{else}}-{{end}}</td>
+                    <td class="{{if $user.Active}}text-success{{else}}text-danger{{end}}">{{if $user.Active}}是{{else}}否{{end}}</td>
+                    <td class="{{if $user.Temporary}}text-success{{else}}text-danger{{end}}">{{if $user.Temporary}}是{{else}}否{{end}}</td>
+                    <td>{{date $user.Created "Y-m-d H:i:s"}}</td>
+                    <td>{{date $user.Updated "Y-m-d H:i:s"}}</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-uid="{{$user.Id}}"
+                            onclick="showEditUserModal(event)">编辑</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-uid="{{$user.Id}}"
+                            onclick="showDeleteUserModal(event)">删除</button>
+                    </td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+        {{if gt .paginator.TotalPage 1}}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-end">
+                <li class="page-count">共 {{.paginator.TotalCount}} 条</li>
+                <li class="page-item {{if .paginator.FirstPage}}disabled{{end}}">
+                    <a class="page-link" {{if gt .paginator.PageNo 1}}href="/users?page={{sub .paginator.PageNo 1}}"{{end}}
+                     aria-label="Previous" aria-disabled="{{.paginator.FirstPage}}">
+                        上一页
+                    </a>
+                </li>
+                {{if .paginator.RangePrev}}
+                <li class="page-item"><a class="page-link" href="/users?page=1}">1</a></li>
+                <li class="page-item"><a class="page-link" href="/users?page={{.paginator.RangePrev}}">...</a></li>
+                {{end}}
+                {{range $index, $value := .paginator.Range}}
+                <li class="page-item {{if eq $.paginator.PageNo $value}}active{{end}}">
+                    <a class="page-link" {{if ne $.paginator.PageNo $value}}href="/users?page={{$value}}"{{end}}>{{$value}}</a>
+                </li>
+                {{end}}
+                {{if .paginator.RangeNext}}
+                <li class="page-item"><a class="page-link" href="/users?page={{.paginator.RangeNext}}">...</a></li>
+                <li class="page-item"><a class="page-link" href="/users?page={{.paginator.TotalPage}}">{{.paginator.TotalPage}}</a></li>
+                {{end}}
+                <li class="page-item {{if .paginator.LastPage}}disabled{{end}}">
+                    <a class="page-link" {{if lt .paginator.PageNo .paginator.TotalPage}}href="/users?page={{add .paginator.PageNo 1}}"{{end}}
+                     aria-label="Next" aria-disabled="{{.paginator.LastPage}}">
+                        下一页
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {{end}}
+    </div>
+</div>
+<div id="userFormModal" class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="userFormLabel" aria-hidden="true"></div>
+<div id="userDeleteModal" class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="userDeleteLabel" aria-hidden="true"></div>

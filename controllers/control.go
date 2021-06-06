@@ -3,15 +3,13 @@ package controllers
 import (
 	"fmt"
 	"path/filepath"
-	"reflect"
-	"time"
 
 	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/core/utils"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/toolkits/file"
 
 	"nginx-http-auth/g"
-	"nginx-http-auth/utils"
 )
 
 type ControlController struct {
@@ -19,54 +17,52 @@ type ControlController struct {
 }
 
 func (this *ControlController) Get() {
+	// 获取客户端IP
 	clientIP := this.Ctx.Input.IP()
-	logtime := time.Now().Format("02/Jan/2006 03:04:05")
 
-	uname := this.GetSession("uname")
-	if uname == nil {
-		this.Ctx.Redirect(302, "/passport/login")
+	// 获取用户Session
+	username := this.GetSession("uname")
+	if username == nil {
+		this.Redirect("/passport/login", 302)
 		return
 	}
 
-	controlUsers, err := beego.AppConfig.Strings("controlUsers")
+	// 获取管理用户配置
+	manageUsers, err := beego.AppConfig.Strings("manageUsers")
 	if err != nil {
-		logs.Error(err.Error())
-		this.Ctx.Output.SetStatus(500)
-		this.Ctx.WriteString("Internal Server Error")
-		return
+		logs.Warn(fmt.Sprintf("%s - get manage users failed: %s", clientIP, err.Error()))
+		manageUsers = []string{"admin"}
 	}
-	if !utils.InSlice(uname.(string), controlUsers) {
-		logs.Debug(uname.(string), controlUsers, controlUsers[0], reflect.TypeOf(controlUsers[0]))
-		this.Ctx.Output.SetStatus(401)
-		this.Ctx.Output.Body([]byte("Not Allowed"))
-		return
+	// 管理用户校验
+	if !utils.InSlice(username.(string), manageUsers) {
+		logs.Warn(fmt.Sprintf("%s - %s - access to control API was denied", clientIP, username))
+		this.Abort("403")
 	}
 
+	// 获取管理类型
 	control := this.Ctx.Input.Param(":control")
 	switch control {
-	case "version":
-		this.Ctx.Output.Body([]byte(g.VERSION))
-	case "health":
-		this.Ctx.Output.Body([]byte("ok"))
-	case "config":
+	case "version": // 获取版本
+		_ = this.Ctx.Output.Body([]byte(g.VERSION))
+	case "health": // 探活
+		_ = this.Ctx.Output.Body([]byte("ok"))
+	case "config": // 获取配置信息
 		var json map[string]interface{}
 		err = beego.AppConfig.Unmarshaler("", &json)
 		if err != nil {
-			logs.Error(err.Error())
-			this.Ctx.Output.SetStatus(500)
-			this.Ctx.WriteString("Internal Server Error")
-			return
+			logs.Error(fmt.Sprintf("%s - get config info failed: %s", clientIP, err.Error()))
+			this.Abort("550")
 		}
 		this.Data["json"] = json
-		this.ServeJSON()
-	case "reload":
+		_ = this.ServeJSON()
+	case "reload": // 重新加载配置
 		err := beego.LoadAppConfig("ini", filepath.Join(file.SelfDir(), "conf/app.conf"))
 		if err != nil {
-			logs.Error(fmt.Sprintf("%s - - [%s] Config reload failed: %s", clientIP, logtime, err.Error()))
-			this.Ctx.Output.Body([]byte("config reload failed"))
+			logs.Error(fmt.Sprintf("%s - config reload failed: %s", clientIP, err.Error()))
+			_ = this.Ctx.Output.Body([]byte("config reload failed"))
 		} else {
-			logs.Notice(fmt.Sprintf("%s - - [%s] Config Reloaded", clientIP, logtime))
-			this.Ctx.Output.Body([]byte("config reloaded"))
+			logs.Info(fmt.Sprintf("%s - config Reloaded", clientIP))
+			_ = this.Ctx.Output.Body([]byte("config reloaded"))
 		}
 	}
 }

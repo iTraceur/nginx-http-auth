@@ -1,0 +1,57 @@
+<script type="text/javascript">
+    $('#saveForm').validate({
+        errorElement: "div",
+        errorClass: "invalid-feedback",
+        focusInvalid: false,
+        ignore: "",
+        rules: {
+            username: {
+                required: true,
+                minlength: 5
+            },
+            password: {
+                required: true,
+                minlength: 8
+            }
+        },
+        messages: {
+            username: {
+                required: "请输入用户名",
+                minlength: "用户名最少要输入 5 个字符"
+            },
+            password: {
+                required: "请输入密码",
+                minlength: "密码长度不能小于 8 个字符"
+            },
+        },
+        highlight: function (e) {
+            $(e).removeClass("is-valid").addClass("is-invalid");
+        },
+        success: function (e) {
+            $(e).prev().removeClass("is-invalid");
+            $(e).remove();
+        }
+    });
+
+    function addUser() {
+        if ($("#saveForm").valid()) {
+            $("#saveForm div.alert").remove();
+            $.post("/users/add",
+                $("#saveForm").serialize(),
+                function (data, status, xhr) {
+                    if ([201, 401].includes(xhr.status)) {
+                        window.location.reload();
+                    } else if (data && "errMap" in data) {
+                        for (var field in data.errMap) {
+                            $("#"+field).addClass("is-invalid");
+                            $("#"+field).after("<div class=\"invalid-feedback\">" + data.errMap[field] + "</div>");
+                        }
+                    } else if (data && "errMsg" in data) {
+                        $("#saveForm").prepend("<div class=\"alert alert-danger\" role=\"alert\">" + data.errMsg + "</div>");
+                    } else {
+                        console.log(data, status, xhr);
+                    }
+                });
+        }
+    }
+</script>

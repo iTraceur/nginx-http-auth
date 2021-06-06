@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	beego "github.com/beego/beego/v2/server/web"
 	"nginx-http-auth/g"
 )
@@ -10,10 +11,10 @@ type MainController struct {
 }
 
 func (this *MainController) Get() {
-	uname := this.GetSession("uname")
-	if uname == nil {
-		this.Ctx.Redirect(302, "/passport/login")
-		return
+	this.TplName = "index.html"
+	data := map[string]string{
+		"title": "nginx-http-auth",
+		"p":     fmt.Sprintf("Version: %s", g.VERSION),
 	}
-	this.Ctx.Output.Body([]byte("nginx-http-auth, version " + g.VERSION))
+	this.Data["data"] = data
 }

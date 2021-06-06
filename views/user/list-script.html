@@ -1,0 +1,29 @@
+<script type="text/javascript">
+    function showAddUserModal() {
+        $("#userFormModal").load("/users/add", function(response, status, xhr){
+            if (xhr.status === 200) {
+                $("#userFormModal").modal("show");
+            } else if (xhr.status === 401) {
+                window.location.reload();
+            }
+        });
+    }
+    function showEditUserModal(e) {
+        $("#userFormModal").load("/users/edit/" + e.target.dataset.uid, function(response, status, xhr){
+            if (xhr.status === 200) {
+                $("#userFormModal").modal("show");
+            } else if (xhr.status === 401) {
+                window.location.reload();
+            }
+        });
+    }
+    function showDeleteUserModal(e) {
+        $("#userDeleteModal").load("/users/delete/" + e.target.dataset.uid, function(response, status, xhr){
+            if (xhr.status === 200) {
+                $("#userDeleteModal").modal("show");
+            } else if (xhr.status === 401) {
+                window.location.reload();
+            }
+        });
+    }
+</script>

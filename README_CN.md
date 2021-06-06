@@ -40,11 +40,18 @@ sessionproviderconfig = "127.0.0.1:6379"  # Session 存储引擎的路径或链�
 xsrfkey = 4b6774f328ee1a2f24fcb62842fc0cfc  # XSRF key
 xsrfexpire = 86400  # XSRF 过期时间
 
-# 远程用户认证接口
+# 用户认证提供方, 可设为local或remote, 默认为local
+authProvider = local
+
+# 是否开启用户与IP绑定功能来限定用户只能使用特定的IP来登录此应用, 当authProvider配置为local时此配置生效,
+# 开启后，管理用户需要在用户管理页面为每个用户绑定客户端IP，默认不开启
+ipBinding = false
+
+# 远程用户认证接口， 当authProvider为remote时需要此配置
 authAPI = http://127.0.0.1:5000/api/login
 
-# 可访问控制接口的用户，默认为admin
-controlUsers = admin;iTraceur;zhaowencheng
+# 管理用户，可访问控制接口及管理本地用户，默认为admin
+manageUsers = admin;iTraceur;zhaowencheng
 
 # 客户端 IP 访问控制
 [ipControl]

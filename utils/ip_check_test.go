@@ -2,6 +2,8 @@ package utils
 
 import (
 	"testing"
+
+	"github.com/beego/beego/v2/core/utils"
 )
 
 func TestIpCheck(t *testing.T) {
@@ -27,5 +29,5 @@ func TestIpCheck(t *testing.T) {
 
 func TestInSlice(t *testing.T) {
 	sss := []string{"1", "2", "3", "4", "5", "6"}
-	t.Log(InSlice("1", sss))
+	t.Log(utils.InSlice("1", sss))
 }

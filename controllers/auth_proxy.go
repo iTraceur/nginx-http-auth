@@ -9,11 +9,11 @@ type AuthProxyController struct {
 }
 
 func (this *AuthProxyController) Get() {
-	this.Ctx.Output.Header("Cache-Control", "no-cache")
-	uname := this.GetSession("uname")
-	if uname == nil {
-		this.Ctx.Abort(401, "401")
-		return
+	this.TplName = "index.html"
+	data := map[string]string{
+		"title": "Are you ok?",
+		"p":     "I'm ok.",
 	}
-	this.Ctx.Output.Body([]byte("ok"))
+	this.Ctx.Output.Header("Cache-Control", "no-cache")
+	this.Data["data"] = data
 }

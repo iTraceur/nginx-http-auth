@@ -1,0 +1,48 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="userLabel">编辑用户</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form class="form-horizontal" id="saveForm" role="form" method="post">
+        {{if .errMsg}}
+        <div class="alert alert-danger" role="alert">{{.errMsg}}</div>
+        {{end}}
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" name="username" placeholder="用户名" class="form-control" value="{{.userToEdit.Username}}">
+        </div>
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" name="password" placeholder="密码" class="form-control" value="{{.userToEdit.Password}}">
+        </div>
+        <div class="form-group">
+            <label for="name">姓名</label>
+            <input type="text" id="name" name="name" placeholder="姓名" class="form-control" value="{{.userToEdit.Name}}">
+        </div>
+        <div class="form-group">
+            <label for="client-ip">客户端IP</label>
+            <input type="text" id="client-ip" name="client_ip" placeholder="客户端IP" class="form-control" value="{{.userToEdit.ClientIp}}">
+        </div>
+        <div class="form-group">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="active" name="active"
+                  {{if .userToEdit.Active}}checked="true"{{end}}>
+              <label class="custom-control-label" for="active">启用</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="temporary" name="temporary"
+                  {{if .userToEdit.Temporary}}checked="true"{{end}}>
+              <label class="custom-control-label" for="temporary">临时用户</label>
+            </div>
+        </div>
+        {{ .xsrfdata }}
+        <div class="modal-footer" style="background-color: white">
+            <button type="button" class="btn btn-primary" data-uid="{{.userToEdit.Id}}" onclick="addUser(event);">提交</button>
+            <button type="button" class="btn btn-light" data-dismiss="modal">取消</button>
+        </div>
+    </form>
+</div>

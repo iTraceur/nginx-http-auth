@@ -1,0 +1,21 @@
+<script type="text/javascript">
+    function deleteUser(e) {
+        $.ajax({
+            type: "DELETE",
+            url: "/users/delete/" + e.target.dataset.uid,
+            headers: {"X-Xsrftoken": $("#userDeleteModal input").val()},
+            success: function(data, status, xhr) {
+                if ([204, 401].includes(xhr.status)) {
+                    window.location.reload();
+                } else if (data && "errMsg" in data) {
+                    $("#userDeleteModal .modal-body").prepend("<div class=\"alert alert-danger\" role=\"alert\">" + data.errMsg + "</div>")
+                } else {
+                    console.log(data, status, xhr);
+                }
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
+</script>

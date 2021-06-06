@@ -43,11 +43,19 @@ sessionproviderconfig = "127.0.0.1:6379"  # The provider's path or link address
 xsrfkey = 4b6774f328ee1a2f24fcb62842fc0cfc  # XSRF key
 xsrfexpire = 86400  # XSRF expiration time
 
-# User remote authentication API
+# User authentication provider, local or remote, default local.
+authProvider = local
+
+# Whether to enable User-IP binding to restrict the user to login to the application using a specific IP,
+# takes effect when the authProvider is configured to local. once enabled, the manage user needs to
+# bind the client IP for each user in the user management page, default false.
+ipBinding = false
+
+# User remote authentication API, required when the authProvider is configured to remote.
 authAPI = http://127.0.0.1:5000/api/login
 
-# The users who can access control API, default admin
-controlUsers = admin;iTraceur;zhaowencheng
+# The users who can access user manager page and control API, default admin.
+manageUsers = admin;iTraceur;zhaowencheng
 
 # Clinet IP control configuration
 [ipControl]

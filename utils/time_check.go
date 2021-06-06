@@ -2,16 +2,18 @@ package utils
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"strings"
 	"time"
+
+	"github.com/beego/beego/v2/core/logs"
 )
 
 func TimeCheck(timeRanges []string) bool {
 	for _, timeRange := range timeRanges {
 		res, err := timeCheck(timeRange)
 		if err != nil {
-			log.Println(err)
+			logs.Error(fmt.Sprintf("Time check error: %s", err.Error()))
 			return false
 		}
 		if res {
@@ -24,7 +26,7 @@ func TimeCheck(timeRanges []string) bool {
 func timeCheck(timeRange string) (bool, error) {
 	tr := strings.Split(timeRange, "-")
 	if len(tr) != 2 {
-		err := errors.New("Time range format wrong.")
+		err := errors.New("time range format wrong")
 		return false, err
 	}
 	timeStart, err := time.Parse("15:04", tr[0])

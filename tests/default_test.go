@@ -1,16 +1,18 @@
 package test
 
 import (
+	"runtime"
+	"testing"
+
 	"net/http"
 	"net/http/httptest"
-	"testing"
-	"runtime"
 	"path/filepath"
-	_ "nginx-http-auth/routers"
 
-	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/core/logs"
+	beego "github.com/beego/beego/v2/server/web"
 	. "github.com/smartystreets/goconvey/convey"
+
+	_ "nginx-http-auth/routers"
 )
 
 func init() {

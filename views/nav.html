@@ -1,0 +1,12 @@
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+  <h5 class="my-0 mr-md-auto font-weight-normal">Nginx http auth</h5>
+  <nav class="my-2 my-md-0 mr-md-3"></nav>
+  <div class="dropdown">
+    <a class="btn dropdown-toggle" href="#" role="button" id="dropdownMenu" data-toggle="dropdown" aria-expanded="false">
+        {{if .user.Name}}{{.user.Name}}{{else}}{{.user.Username}}{{end}}
+    </a>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenu">
+      <a class="dropdown-item" href="/passport/logout">注销</a>
+    </div>
+  </div>
+</div>
